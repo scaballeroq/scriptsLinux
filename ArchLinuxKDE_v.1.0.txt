@@ -1,0 +1,274 @@
+###########################################################################
+Configuración de archivos del sistema.
+###########################################################################
+########## Hosts
+sudo nano /etc/hosts
+
+127.0.0.1  localhost archlinux
+::1        localhost archlinux
+
+###########################################################################
+########## Pacman
+sudo nano /etc/pacman.conf
+
+# Misc options
+ Color
+ ParallelDownloads = 10
+ ILoveCandy
+
+###########################################################################
+Bluetooth
+###########################################################################
+##########
+systemctl enable --now bluetooth
+
+###########################################################################
+Herramientas de compilación
+###########################################################################
+##########
+sudo pacman -S --needed git linux-headers base-devel
+
+###########################################################################
+HERRAMIENTAS
+###########################################################################
+########## FICHEROS
+sudo pacman -S --needed exfatprogs shfs-utils ntfs-3g android-file-transfer android-tools android-udev msmtp libcddb dosfstools jfsutils f2fs-tools btrfs-progs udftools xfsprogs nilfs-utils gpart mtools
+
+########## LIBRERIAS MULTIMEDIA
+sudo pacman -S --needed gst-libav gst-plugins-ugly gst-plugins-bad ffmpeg
+
+########## COMPRESORES
+sudo pacman -S --needed p7zip unrar
+
+###########################################################################
+AUR - TIENDAS DE SOFTWARE
+###########################################################################
+########## PARU
+git clone https://aur.archlinux.org/paru.git && cd paru && makepkg -si
+
+########## YAY
+git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si
+
+########## OCTOPI
+paru -S octopi
+
+########## FLATPAK
+sudo pacman -S flatpak xdg-desktop-portal-gtk xdg-desktop-portal-kde
+
+###########################################################################
+SOFTWARE
+###########################################################################
+########## Aplicaciones de Plasma
+sudo pacman -S -needed kde-system spectacle gwenview ark filelight isoimagewriter kate kcalc kdialog kfind kwalletmanager sweeper yakuake dolphin-plugins inotify-tools okular kgpg
+
+########## FUSE
+sudo pacman -S fuse fuse2fs fuseiso
+
+########## NAVEGADORES
+sudo pacman -S firefox firefox-i18n-es-es
+paru -S google-chrome
+paru -S microsoft-edge-stable-bin
+
+########## CORREO ELECTRÓNICO
+sudo pacman -S thunderbird thunderbird-i18n-es-es
+
+########## OFIMATICA
+sudo pacman -S libreoffice-fresh libreoffice-fresh-es
+
+########## IMAGEN
+sudo pacman -S gimp gimp-help-es
+
+########## VIDEO
+sudo pacman -S obs-studio
+sudo pacman -S kdenlive
+
+########## ANYDESK
+sudo pacman -S anydesk-bin
+
+########## GOOGLE EARTH
+paru -S google-earth-pro
+
+########## TELEGRAM
+sudo pacman -S telegram-desktop
+
+########## BALENA ETCHER
+paru -S balena-etcher
+
+########## SPOTIFY
+paru spotify
+
+########## DISCORD
+sudo pacman -S discord
+
+###########################################################################
+FASTFETCH
+###########################################################################
+##########
+sudo pacman -S fastfetch
+fastfetch --gen-config
+cp ~/.config/fastfetch/config.jsonc ~/.config/fastfetch/config.jsonc.bak
+kate /home/caballero/.config/fastfetch/config.jsonc
+
+###########################################################################
+ASPECTO
+###########################################################################
+##########
+sudo pacman -S arc-gtk-theme papirus-icon-theme kvantum ttf-hack-nerd  ttf-meslo-nerd ttf-ubuntu-font-family
+paru -S apple-fonts ttf-ms-fonts
+fc-cache -f -v
+paru -S arc-kde
+
+###########################################################################
+MDNS para carpetas compartidas en red
+###########################################################################
+##########
+sudo pacman -S avahi nss-mdns
+
+kate /etc/nsswitch.conf
+    hosts: mymachines mdns_minimal [NOTFOUND=return] resolve [!UNAVAIL=return] files myhostname dns
+
+systemctl enable --now avahi-daemon
+
+###########################################################################
+FIREWALL
+###########################################################################
+##########
+sudo pacman -S firewalld python-pyqt6
+systemctl enable --now firewalld
+sudo firewall-cmd --set-default-zone=home
+
+###########################################################################
+PROGRAMACION
+###########################################################################
+##########
+sudo pacman -S python-pip python-virtualenv podman podman-compose
+paru -S visual-studio-code-bin
+sudo pacman -S pycharm-community-edition
+flatpak install flathub io.podman_desktop.PodmanDesktop
+
+###########################################################################
+PLYMOUTH
+###########################################################################
+##########
+sudo pacman -S plymouth
+kate /etc/mkinitcpio.conf
+    HOOKS=(base udev plymouth autodetect microcode modconf kms keyboard keymap consolefont block filesystems fsck)
+
+###########################################################################
+GRUB
+###########################################################################
+##########
+kate /etc/default/grub
+    GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet splash"
+sudo mkinitcpio -P
+
+
+###########################################################################
+TimeShift
+###########################################################################
+##########
+sudo pacman -S grub-btrfs
+sudo systemctl enable --now grub-btrfsd.service
+paru -S timeshift timeshift-autosnap
+kate /etc/timeshift-autosnap.conf
+    maxSnapshots=10
+sudo timeshift-autosnap
+sudo mkinitcpio -P
+sudo grub-mkconfig -o /boot/grub/grub.cfg
+
+###########################################################################
+AppArmor
+###########################################################################
+##########
+sudo pacman -S apparmor
+sudo systemctl enable apparmor.service
+kate /etc/default/grub
+    GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet splash apparmor=1 security=apparmor"
+sudo grub-mkconfig -o /boot/grub/grub.cfg
+
+###########################################################################
+ZSH
+###########################################################################
+##########
+sudo pacman -S --needed zsh wget lsd bat git
+
+########## Oh-My-ZSH
+sh -c "$(wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)"
+
+########## Powerlevel10k
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/.powerlevel10k
+echo 'source ~/.powerlevel10k/powerlevel10k.zsh-theme' >>~/.zshrc
+
+########## ZSH PLUGINS (SOLO para Oh-My-ZSH)
+cd ~
+git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-completions
+git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+git clone https://github.com/zdharma-continuum/fast-syntax-highlighting.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/fast-syntax-highlighting
+git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autocomplete
+
+kate ~/.zshrc
+
+    plugins=(git zsh-autosuggestions zsh-syntax-highlighting fast-syntax-highlighting zsh-autocomplete)
+
+    fpath+=${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-completions/src
+
+    source "$ZSH/oh-my-zsh.sh"
+
+    #AL FINAL DEL FICHERO
+
+    # Alias
+    alias ls='lsd'
+    alias ll='lsd -l'
+    alias la='lsd -a'
+    alias lla='lsd -la'
+    alias cat='bat'
+
+###########################################################################
+RCLONE
+###########################################################################
+##########
+sudo pacman -S rclone
+
+###########################################################################
+Distrobox
+###########################################################################
+##########
+sudo pacman -S distrobox
+systemctl enable --now podman
+
+###########################################################################
+Juegos
+###########################################################################
+########## Steam
+sudo pacman -S steam
+
+########## Proton Tools
+paru -S protonup-qt protontricks
+
+########## Dependencias de SteamTinkerLaunch
+sudo pacman -S xdotool xorg-xwininfo yad
+
+########## SteamTinkerLaunch
+paru -S steamtinkerlaunch
+
+########## Gamemode
+sudo pacman -S gamemode
+
+########## Heroic
+sudo pacman -S heroic-games-launcher-bin
+
+########## Lutris
+sudo pacman -S --needed wine-staging giflib lib32-giflib libpng lib32-libpng libldap lib32-libldap gnutls lib32-gnutls \
+mpg123 lib32-mpg123 openal lib32-openal v4l-utils lib32-v4l-utils libpulse lib32-libpulse libgpg-error \
+lib32-libgpg-error alsa-plugins lib32-alsa-plugins alsa-lib lib32-alsa-lib libjpeg-turbo lib32-libjpeg-turbo \
+sqlite lib32-sqlite libxcomposite lib32-libxcomposite libxinerama lib32-libgcrypt libgcrypt lib32-libxinerama \
+ncurses lib32-ncurses ocl-icd lib32-ocl-icd libxslt lib32-libxslt libva lib32-libva gtk3 \
+lib32-gtk3 gst-plugins-base-libs lib32-gst-plugins-base-libs vulkan-icd-loader lib32-vulkan-icd-loader winetricks
+
+sudo pacman -S lutris
+
+###########################################################################
+NO INSTALADO
+###########################################################################
+
