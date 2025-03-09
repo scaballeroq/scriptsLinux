@@ -26,23 +26,23 @@ done
 # Funciones
 mount_rclone() {
     echo "Montando con rclone..."
-    rclone mount GoogleDrive: /home/caballero/Workspace/.GoogleDrive/ --daemon
+    rclone mount GoogleDrive: /home/caballero/.GoogleDrive/ --daemon
     echo "Montaje completado."
 }
 
 unmount_rclone() {
     echo "Desmontando con rclone..."
-    fusermount -u /home/caballero/Workspace/.GoogleDrive/
+    fusermount -u /home/caballero/.GoogleDrive/
     echo "Desmontaje completado."
 }
 
 sync_rclone() {
     if [ -z "$PATH_PARAM" ]; then
         echo "Sincronizando todo con rclone..."
-        rclone sync GoogleDrive: /home/caballero/Workspace/
+        rclone sync GoogleDrive: /home/caballero/
     else
         echo "Sincronizando solo la carpeta $PATH_PARAM con rclone..."
-        rclone sync GoogleDrive:/"$PATH_PARAM" /home/caballero/Workspace/"$PATH_PARAM" 
+        rclone sync GoogleDrive:/"$PATH_PARAM" /home/caballero/"$PATH_PARAM" 
     fi
     echo "Sincronización completada."
 }
