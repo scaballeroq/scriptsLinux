@@ -2,7 +2,7 @@
 
 # Verifica que se pase al menos un parámetro
 if [ $# -lt 1 ]; then
-    echo "Uso: $0 {mount|unmount|sync} [--path /ruta/a/usar]"
+    echo "Uso: $0 {mount|unmount|sync|push} [--path /ruta/a/usar]"
     exit 1
 fi
 
@@ -47,6 +47,17 @@ sync_rclone() {
     echo "Sincronización completada."
 }
 
+push_rclone() {
+    if [ -z "$PATH_PARAM" ]; then
+        echo "Subiendo todo a Google Drive con rclone..."
+        rclone sync /home/caballero/Workspace/GoogleDrive/ GoogleDrive:
+    else
+        echo "Subiendo solo la carpeta $PATH_PARAM a Google Drive con rclone..."
+        rclone sync /home/caballero/Workspace/GoogleDrive/"$PATH_PARAM" GoogleDrive:/"$PATH_PARAM"
+    fi
+    echo "Subida completada."
+}
+
 # Switch para manejar los parámetros
 case "$COMMAND" in
     mount)
@@ -57,6 +68,9 @@ case "$COMMAND" in
         ;;
     sync)
         sync_rclone
+        ;;
+    push)
+        push_rclone
         ;;
     *)
         echo "Parámetro inválido. Uso: $0 {mount|unmount|sync} [--path /ruta/a/usar]"
